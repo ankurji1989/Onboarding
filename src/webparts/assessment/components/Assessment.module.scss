@@ -1,0 +1,71 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+ 
+.assessment {
+  .container {
+    max-width: 1000px;
+    margin: 0px auto;
+  }
+ 
+  .row {
+    @include ms-Grid-row;
+    padding: 20px;
+  }
+ 
+  .column {
+    @include ms-Grid-col;
+    @include ms-lg10;
+    @include ms-xl8;
+    @include ms-xlPush2;
+    @include ms-lgPush1;
+  }
+ 
+  .title {
+    @include ms-font-xl;
+    @include ms-fontColor-white;
+  }
+ 
+  .subTitle {
+    @include ms-font-l;
+    @include ms-fontColor-white;
+  }
+ 
+  .description {
+    @include ms-font-l;
+    @include ms-fontColor-white;
+  }
+ 
+  .questionRow{
+    box-shadow: 0 0px 4px 4px rgba(0, 0, 0, 0.3);
+    padding:15px;
+    box-sizing:border-box;
+    margin-bottom: 15px;
+    font-weight:bold;
+  }
+}
+.dialogContainer{
+  min-width: auto;
+  max-width: 600px;
+  width: 100%;
+  .container {
+    max-width: 800px;
+    margin: 0px auto;
+  }
+ 
+  .row{
+    @include ms-Grid-row;
+    table{margin:0px 0px 15px 0px;width:100%;
+    th{padding:3px;width:130px;}
+    td{padding: 3px;}
+    }
+  }
+}
+
+.alertdialogContainer{
+  min-width: auto;
+  max-width: 400px;
+  width: 100%;
+  .container {
+    max-width: 400px;
+    margin: 0px auto;
+  }
+}

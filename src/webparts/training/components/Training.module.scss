@@ -1,19 +1,21 @@
 @import '~office-ui-fabric-react/dist/sass/References.scss';
-
+ 
 .training {
+  max-width: 1000px;
+  margin:0px auto;
   .container {
-    max-width: 700px;
+    max-width: 100%;
     margin: 0px auto;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
   }
-
+ 
   .row {
     @include ms-Grid-row;
     @include ms-fontColor-white;
     background-color: $ms-color-themeDark;
     padding: 20px;
   }
-
+ 
   .column {
     @include ms-Grid-col;
     @include ms-lg10;
@@ -21,33 +23,17 @@
     @include ms-xlPush2;
     @include ms-lgPush1;
   }
-
-  .title {
-    @include ms-font-xl;
-    @include ms-fontColor-white;
-  }
-
-  .subTitle {
-    @include ms-font-l;
-    @include ms-fontColor-white;
-  }
-
-  .description {
-    @include ms-font-l;
-    @include ms-fontColor-white;
-  }
-
   .button {
     // Our button
     text-decoration: none;
     height: 32px;
-
+ 
     // Primary Button
     min-width: 80px;
     background-color: $ms-color-themePrimary;
     border-color: $ms-color-themePrimary;
     color: $ms-color-white;
-
+ 
     // Basic Button
     outline: transparent;
     position: relative;
@@ -59,16 +45,82 @@
     text-align: center;
     cursor: pointer;
     display: inline-block;
-    padding: 0 16px;
-
-    .label {
-      font-weight: $ms-font-weight-semibold;
-      font-size: $ms-font-size-m;
-      height: 32px;
-      line-height: 32px;
-      margin: 0 4px;
-      vertical-align: top;
-      display: inline-block;
+    padding: 0;
+ 
+  }
+ 
+  .module{
+    display: block;
+    border: 1px solid #ddd;
+    box-shadow: 1px 1px 3px #ddd;
+    margin: 0px 0px 5px 0px;
+    .moduleHeading{
+      background: #f3f3f3;
+      border-bottom: 1px solid #ddd;
+      box-sizing: border-box;
+      h5{
+        font-size: 16px;
+        margin: 0px;
+        padding: 12px 10px;
+        box-sizing: border-box;
+        span{
+          float: right;
+          min-width: 200px;
+        }
+      }
     }
+  }
+  .subModule{
+    display:block;
+    padding: 10px;
+    box-sizing: border-box;
+    .moduleHeading{
+      background: #fff;
+      border-bottom: 0px solid #ddd;
+      h5{
+        font-size: $ms-font-size-m;
+        margin: 0px;
+        padding-left: 10px;
+      }
+    }
+    a{
+      text-decoration: none;
+      display: inline-block;
+      color: $ms-color-themePrimary;
+    }
+    table{width: 100%;margin-bottom: 10px;
+      box-sizing: border-box;
+      border-collapse: collapse;
+      th{
+        border-bottom: 2px solid;
+        border-color: #eaeaea;
+        padding: 5px;
+        text-align:left;
+        box-sizing: border-box;
+      }
+      td{
+        border-bottom: 1px solid;
+        border-color: #eaeaea;
+        padding: 5px;
+        box-sizing: border-box;
+      }
+      tr:hover td{
+        background: #fffff5;
+      }
+    }
+  }
+  .footerButtons{
+    text-align: right;
+    padding: 10px 0px;
+    box-sizing: border-box;
+  }
+}
+.alertdialogContainer{
+  min-width: auto;
+  max-width: 400px;
+  width: 100%;
+  .container {
+    max-width: 400px;
+    margin: 0px auto;
   }
 }
