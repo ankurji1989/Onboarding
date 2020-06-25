@@ -1,0 +1,25 @@
+@import '~office-ui-fabric-react/dist/sass/References.scss';
+
+.onboardingCheckList {
+  .tableContainer{
+    width: 100%;
+    max-width: 600px;
+    margin: 0px auto;
+  }
+  .checkListTable{
+    width: 100%;
+    th {
+      text-align: left;
+      padding: 3px;
+    }
+    td{
+      padding: 3px;
+    }
+    tr th:first-child{
+      width: 90px;
+    }
+    tr:nth-child(2n+2) td {
+      background: #f1f1f1;
+    }
+  }
+}

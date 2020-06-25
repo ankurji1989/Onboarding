@@ -281,4 +281,23 @@ export class SPDataOperations {
     }
     return entityType;
   }
+
+  public static async getListItems(listGuid: string, fields: string, expand?: string, filter?: string) {
+    let allItems: any[];
+    try {
+      allItems = await sp.web.lists.getById(listGuid).items.select(fields).expand(expand).filter(filter).get();
+    } catch(error) {
+      console.log('SPDataOperations.getListItems' + error);
+    }
+    return allItems;
+  }
+
+  public static async updateListItem(listGuid: string, itemId: number, jsonData: any) {
+    try {
+      console.log(jsonData);
+      await sp.web.lists.getById(listGuid).items.getById(itemId).update(jsonData);
+    } catch(error) {
+      console.log('SPDataOperations.updateListItem' + error);
+    }
+  }
 }
