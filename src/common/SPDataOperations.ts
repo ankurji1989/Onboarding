@@ -294,10 +294,49 @@ export class SPDataOperations {
 
   public static async updateListItem(listGuid: string, itemId: number, jsonData: any) {
     try {
-      console.log(jsonData);
       await sp.web.lists.getById(listGuid).items.getById(itemId).update(jsonData);
     } catch(error) {
       console.log('SPDataOperations.updateListItem' + error);
+    }
+  }
+
+  public static async getUserID(userLoginName: string){
+    let userObject: any;
+    try {
+      userObject = await sp.web.siteUsers.getByLoginName(userLoginName).get();
+    } catch(error) {
+      console.log('SPDataOperations.getUserID' + error);
+    }
+    return userObject;
+  }
+
+  public static async getAttachment(listGuid: string, itemId: number) {
+    let allAttachment: any[];
+    try {
+      allAttachment = await sp.web.lists.getById(listGuid).items.getById(itemId).attachmentFiles.get();
+    } catch(error) {
+      console.log('SPDataOperations.getListItems' + error);
+    }
+    return allAttachment;
+  }
+
+  public static async addAttachment(listGuid: string, itemId: number, fileNo: number, file: any) {
+    try {
+      let fileName: string = file.name;
+      fileName = fileNo +'.' + fileName.split('.').reverse()[0];
+      await sp.web.lists.getById(listGuid).items.getById(itemId).attachmentFiles.add(fileName, file);
+      window.location.href = window.location.href;
+    } catch(error) {
+      console.log('SPDataOperations.getListItems' + error);
+    }
+  }
+
+  public static async deleteAttachment(listGuid: string, itemId: number, fileName: string) {
+    try {
+      await sp.web.lists.getById(listGuid).items.getById(itemId).attachmentFiles.getByName(fileName).delete();
+      window.location.href = window.location.href;
+    } catch(error) {
+      console.log('SPDataOperations.getListItems' + error);
     }
   }
 }

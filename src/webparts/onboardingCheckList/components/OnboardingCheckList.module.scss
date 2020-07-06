@@ -14,6 +14,7 @@
     }
     td{
       padding: 3px;
+      position: relative;
     }
     tr th:first-child{
       width: 90px;
@@ -22,4 +23,33 @@
       background: #f1f1f1;
     }
   }
+
+  .disabled{
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    background:rgba(200, 200, 200, 0.30);
+  }
+
+  .actionButton{
+    white-space: nowrap;
+    font-size: 13px;
+    label {
+      cursor: pointer;
+      color: "[theme:themePrimary]";
+    }
+    button {
+      color: "[theme:themePrimary]";
+    }
+    a {
+      color: "[theme:themePrimary]";
+    }
+  }
+}
+
+.emailDialogContainer{
+  max-width: 400px;
+  width: 100%;
 }

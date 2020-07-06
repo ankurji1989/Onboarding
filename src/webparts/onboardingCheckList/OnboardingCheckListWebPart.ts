@@ -16,6 +16,7 @@ import { sp } from '@pnp/sp';
 export interface IOnboardingCheckListWebPartProps {
   checkList: string;
   onboardingList: string;
+  registrationList: string;
 }
 
 export default class OnboardingCheckListWebPart extends BaseClientSideWebPart <IOnboardingCheckListWebPartProps> {
@@ -30,8 +31,10 @@ export default class OnboardingCheckListWebPart extends BaseClientSideWebPart <I
     const element: React.ReactElement<IOnboardingCheckListProps> = React.createElement(
       OnboardingCheckList,
       {
+        context: this.context,
         checkList: this.properties.checkList,
-        onboardingList: this.properties.onboardingList
+        onboardingList: this.properties.onboardingList,
+        registrationList: this.properties.registrationList
       }
     );
 
@@ -72,7 +75,20 @@ export default class OnboardingCheckListWebPart extends BaseClientSideWebPart <I
                 }),
                 PropertyFieldListPicker('onboardingList', {
                   label: 'Select employee onboarding list',
-                  selectedList: this.properties.checkList,
+                  selectedList: this.properties.onboardingList,
+                  includeHidden: false,
+                  orderBy: PropertyFieldListPickerOrderBy.Title,
+                  disabled: false,
+                  onPropertyChange: this.onPropertyPaneFieldChanged.bind(this),
+                  properties: this.properties,
+                  context: this.context,
+                  onGetErrorMessage: null,
+                  deferredValidationTime: 0,
+                  key: 'listPickerFieldId'
+                }),
+                PropertyFieldListPicker('registrationList', {
+                  label: 'Select employee registration list',
+                  selectedList: this.properties.registrationList,
                   includeHidden: false,
                   orderBy: PropertyFieldListPickerOrderBy.Title,
                   disabled: false,
