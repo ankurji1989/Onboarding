@@ -4,7 +4,7 @@ import { IOnboardingCheckListProps } from './IOnboardingCheckListProps';
 import { escape, get } from '@microsoft/sp-lodash-subset';
 import { SPDataOperations } from '../../../common/SPDataOperations';
 import { UrlQueryParameterCollection } from '@microsoft/sp-core-library';
-import { Toggle, Checkbox, PrimaryButton, Dialog, DialogType, Spinner, DialogFooter, DefaultButton, Button, ActionButton, Link } from 'office-ui-fabric-react';
+import { Toggle, Checkbox, PrimaryButton, Dialog, DialogType, Spinner, DialogFooter, DefaultButton, Button, ActionButton, Link, MessageBar, MessageBarType } from 'office-ui-fabric-react';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 
 export interface IOnboardingCheckListState {
@@ -16,11 +16,13 @@ export interface IOnboardingCheckListState {
   registrationListItemID: number;
   userIdCreation: boolean;
   filePickerResult:any;
+  buttonDisabled: boolean;
 }
 
 export default class OnboardingCheckList extends React.Component<IOnboardingCheckListProps, IOnboardingCheckListState> {
   private onboardingId: number = null;
   private userLoginName: string = null;
+  private checkListCompleted: boolean = false;
   constructor(props) {
     super(props);
     this.toggleOnChange = this.toggleOnChange.bind(this);
@@ -28,6 +30,7 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
     this.submitCheckList = this.submitCheckList.bind(this);
     this.updateUserEmail = this.updateUserEmail.bind(this);
     this.getPeoplePickerItems = this.getPeoplePickerItems.bind(this);
+    this.uploadAttachment = this.uploadAttachment.bind(this);
     this.state = {
       employeeData: [],
       checkList: [],
@@ -36,7 +39,8 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
       hideConfirmDialog: true,
       registrationListItemID: 0,
       userIdCreation: false,
-      filePickerResult: null
+      filePickerResult: null,
+      buttonDisabled: false
     }
   }
 
@@ -55,15 +59,16 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
     getAttachement.map((file) => {
       allAttachment.push({fileNo: Number(file.FileName.split('.')[0]), fileName: file.FileName, filePath: file.ServerRelativeUrl});
     });
-    SPDataOperations.getListItems(this.props.onboardingList, 'Employee,RegistrationListItemID,OnBoardingCheckList/Id,OnBoardingCheckListNA/Id,EmployeeID1/Id','OnBoardingCheckList,OnBoardingCheckListNA,EmployeeID1',`Id eq ${empId}`).then((onboardingData) => {
+    SPDataOperations.getListItems(this.props.onboardingList, 'Employee,RegistrationListItemID,OnBoardingCheckList/Id,OnBoardingCheckListNA/Id,EmployeeID1/Id,CheckListCompleted','OnBoardingCheckList,OnBoardingCheckListNA,EmployeeID1',`Id eq ${empId}`).then((onboardingData) => {
       if(onboardingData.length > 0 ) {
+        this.checkListCompleted = onboardingData[0].CheckListCompleted === 'Complete' ? true : false;
         this.getCheckListDetails(onboardingData[0], allAttachment);
       }
     });
   }
 
   public getCheckListDetails(employeeData: any, attachment: any[]) {
-    SPDataOperations.getListItems(this.props.checkList, 'Id,Title,attachmentRequired,Order0', ``, ``).then((checkList) => {
+    SPDataOperations.getListItems(this.props.checkList, 'Id,Title,attachmentRequired,Order0,Required', ``, `CheckListStatus eq 1`).then((checkList) => {
       let updatedChecklist = [];
       checkList.sort((item1, item2) => item1.Order0 - item2.Order0).map((listItem) => {
         const attachmentFile = attachment.filter(file => file.fileNo === listItem.Id);
@@ -73,12 +78,24 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
           selected: employeeData.OnBoardingCheckList.filter(item => listItem.Id === item.Id).length > 0 ? true : false,
           notApplicable: employeeData.OnBoardingCheckListNA.filter(item => listItem.Id === item.Id).length > 0 ? true : false,
           attachmentRequired: listItem.attachmentRequired === true ?  true : false,
-          attachmentFile: attachmentFile.length > 0 ? attachmentFile[0] : null
+          attachmentFile: attachmentFile.length > 0 ? attachmentFile[0] : null,
+          required: listItem.Required === true ? true : false
         };
         updatedChecklist.push(checkListObject);
       });
       const userIdCreation = (employeeData.EmployeeID1 !== null && employeeData.EmployeeID1 !== undefined) ? true : false;
-      this.setState({checkList: updatedChecklist, employeeData: employeeData, registrationListItemID: employeeData.RegistrationListItemID, userIdCreation: userIdCreation});
+      const checkListCount: number = updatedChecklist.length;
+      let CheckedListCount: number = 0;
+      updatedChecklist.map((item) => {
+        if (item.selected === true) {
+          CheckedListCount++;
+        }
+        if (item.notApplicable === true) {
+          CheckedListCount++
+        }
+      });
+      let buttonDisabled: boolean = checkListCount === CheckedListCount ? true : false;
+      this.setState({checkList: updatedChecklist, employeeData: employeeData, registrationListItemID: employeeData.RegistrationListItemID, userIdCreation: userIdCreation, buttonDisabled: buttonDisabled});
     });
   }
 
@@ -116,12 +133,24 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
       }
     });
 
+    let buttonDisabled: boolean = false;
+    let updateObject: any = {OnBoardingCheckListId:{'__metadata': { type: 'Collection(Edm.Int32)' },'results': selectedCheckList}, OnBoardingCheckListNAId: {'__metadata': { type: 'Collection(Edm.Int32)' },'results': checkListNA}};
+
     if(checkListCount === selectedCheckListCount && confirmDialog === false) {
       this.setState({hideConfirmDialog: false});
     } else {
       this.setState({hideDialog: false});
-      await SPDataOperations.updateListItem(this.props.onboardingList, this.onboardingId, {OnBoardingCheckListId: {'__metadata': { type: 'Collection(Edm.Int32)' },'results': selectedCheckList}, OnBoardingCheckListNAId: {'__metadata': { type: 'Collection(Edm.Int32)' },'results': checkListNA}} );
-      this.setState({hideDialog: true, hideConfirmDialog: true});
+      if(checkListCount === selectedCheckListCount){
+        updateObject.OnBoardingStatus = 'Completed';
+        updateObject.CheckListCompleted = 'Complete';
+        updateObject.CompletedDate = new Date();
+        updateObject.Flag = 1;
+        buttonDisabled = true;
+      } else {
+        updateObject.OnBoardingStatus = 'In Progress';
+      }
+      await SPDataOperations.updateListItem(this.props.onboardingList, this.onboardingId, updateObject);
+      this.setState({hideDialog: true, hideConfirmDialog: true, buttonDisabled: buttonDisabled});
     }
 
   }
@@ -141,7 +170,8 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
     }
   }
 
-  private uploadAttachment(fileNo: number): void {
+  public uploadAttachment(fileNo: number): void {
+    this.setState({hideDialog:false});
     let file: any = document.getElementById("fileUpload");
     let fileName: string = null;
     if(file) {
@@ -159,7 +189,7 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
 
 
   public render(): React.ReactElement<IOnboardingCheckListProps> {
-    const {checkList, hideDialog, hideEmailDialog, hideConfirmDialog, userIdCreation} = this.state;
+    const {checkList, hideDialog, hideEmailDialog, hideConfirmDialog, userIdCreation, buttonDisabled} = this.state;
     return (
       <div className={ styles.onboardingCheckList }>
         <div className={styles.tableContainer}>
@@ -174,13 +204,13 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
               </tr>
               {checkList.map((item) =>{
                 return (<tr>
-                  <td><Toggle label='' inlineLabel onText='Yes' offText='No' onChange={() => this.toggleOnChange(item)} defaultChecked={item.notApplicable}  /></td>
+                  <td><Toggle label='' inlineLabel onText='Yes' offText='No' onChange={() => this.toggleOnChange(item)} defaultChecked={item.notApplicable} disabled={item.required} title={item.required ? 'Checklist Required' : null }  /></td>
                   <td>
                     {item.Id === 17 && userIdCreation === false ?
                       <DefaultButton text={item.Title} onClick={() => this.setState({hideEmailDialog: false})} disabled={item.notApplicable} />
                     :
                     <div>
-                      <Checkbox label={item.Title} onChange={() => this.checkBoxOnChange(item)} checked={item.selected} disabled={item.notApplicable} />
+                      <Checkbox label={item.Title + (item.required ? '*' : '')} onChange={() => this.checkBoxOnChange(item)} checked={item.selected} disabled={item.notApplicable} />
                       {item.attachmentRequired === true && item.attachmentFile === null && item.notApplicable !== true ?
                       <div className={styles.disabled} onClick={() => alert('Please upload the attachment first to check this option!')}>&nbsp;</div>
                       :
@@ -193,12 +223,16 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
                     {item.attachmentRequired === true ?
                     <div className={styles.actionButton}>
                       {item.attachmentFile === null ?
-                        <label><input type='file' id='fileUpload' name='fileUpload' style={{display:'none'}} onChange={() => this.uploadAttachment(item.Id)} disabled={item.notApplicable}/> Upload</label>
+                        <div>
+                          {this.checkListCompleted !== true &&
+                            <label><input type='file' id='fileUpload' name='fileUpload' style={{display:'none'}} onChange={() => this.uploadAttachment(item.Id)} disabled={item.notApplicable} accept='image/*,.pdf'/> Upload</label>
+                          }
+                          </div>
                         :
                         <div>
                           <Link target='_blank' data-interception='off' href={item.attachmentFile.filePath}>View</Link>
                           &nbsp;|&nbsp;
-                          <Link onClick={() => this.deleteAttachment(item.attachmentFile.fileName)}>Delete</Link>
+                          <Link onClick={() => this.deleteAttachment(item.attachmentFile.fileName)} disabled={this.state.buttonDisabled}>Delete</Link>
                         </div>
                       }
                       
@@ -210,7 +244,10 @@ export default class OnboardingCheckList extends React.Component<IOnboardingChec
                   </tr>)
               })}
             </table>
-            <PrimaryButton text="Submit" onClick={() => this.submitCheckList(false)} />
+            <div className={styles.footerButtons}>
+              <MessageBar messageBarType={MessageBarType.error}>* Items are mandatory</MessageBar>
+              <PrimaryButton text="Submit" onClick={() => this.submitCheckList(false)} disabled={buttonDisabled} />
+            </div>
           </div>
           }
         </div>
