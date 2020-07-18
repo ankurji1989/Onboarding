@@ -325,7 +325,6 @@ export class SPDataOperations {
       let fileName: string = file.name;
       fileName = fileNo +'.' + fileName.split('.').reverse()[0];
       await sp.web.lists.getById(listGuid).items.getById(itemId).attachmentFiles.add(fileName, file);
-      window.location.href = window.location.href;
     } catch(error) {
       console.log('SPDataOperations.getListItems' + error);
     }
@@ -334,7 +333,6 @@ export class SPDataOperations {
   public static async deleteAttachment(listGuid: string, itemId: number, fileName: string) {
     try {
       await sp.web.lists.getById(listGuid).items.getById(itemId).attachmentFiles.getByName(fileName).delete();
-      window.location.href = window.location.href;
     } catch(error) {
       console.log('SPDataOperations.getListItems' + error);
     }
