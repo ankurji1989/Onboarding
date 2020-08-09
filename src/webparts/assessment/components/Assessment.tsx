@@ -105,17 +105,19 @@ export default class Assessment extends React.Component<IAssessmentProps, IAsses
     //console.log(this.state);
     if (this.props.configured) {
     let assessmentAllData = this.state.assessmentModule;
+    let options: IChoiceGroupOption[] = [];
     return (
       <div className={ styles.assessment }>
         <div className={ styles.container }>
           <div className={ styles.row }>
             {this.state.moduleAssessment.map((item,i) => {
-              const options: IChoiceGroupOption[] = [
+              options = [
                 { key: item.Id+'_A', text: item.A},
                 { key: item.Id+'_B', text: item.B },
                 { key: item.Id+'_C', text: item.OData__x0043_ },
                 { key: item.Id+'_D', text: item.D }
               ];
+              options = options.filter((item) => item.text !== null && item.text !== '');
               return (<div className={styles.questionRow}>
                 <ChoiceGroup key={item.Id} options={options} label={"Q."+(i+1)+" "+item.Title} onChange={this._onChange} />
               </div>);

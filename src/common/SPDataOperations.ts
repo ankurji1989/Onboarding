@@ -11,11 +11,9 @@ export class SPDataOperations {
   public static async LOADCurrentUserTraining(lists: string, userEmail:string): Promise<any> {
     let selectedTraining: any[] = [];
     let selectedTrainingObject:any[] = [];
-    //alert()
+    let userData: any[];
     try {
-      let userData = await sp.web.lists.getById(lists).items.select('Training/Id,Training/ModuleCalc,EmployeeID1/EMail').expand('Training,EmployeeID1').filter(`EmployeeID1/EMail eq '`+userEmail+`'`).top(500).get();
-      //console.log(userData)
-      //alert()
+      userData = await sp.web.lists.getById(lists).items.select('Created,Training/Id,Training/ModuleCalc,EmployeeID1/EMail').expand('Training,EmployeeID1').filter(`EmployeeID1/EMail eq '`+userEmail+`'`).top(500).get();
       userData[0].Training.map((training) =>{
         selectedTraining.push(training.Id);
         selectedTrainingObject.push({'Module':training.ModuleCalc,'Id':training.Id});
@@ -25,7 +23,8 @@ export class SPDataOperations {
     }
     let allselectedTraining:any = {'selectedTraining':selectedTraining};
     let allselectedTrainingObject:any = {'selectedTrainingObject':selectedTrainingObject};
-    selectedTraining = {...allselectedTraining,...allselectedTrainingObject};
+    let createdDate = {'Created': userData[0].Created}
+    selectedTraining = {...allselectedTraining,...allselectedTrainingObject,...createdDate};
     return selectedTraining;
   }
  
@@ -45,7 +44,8 @@ export class SPDataOperations {
     let trainingIDs:any = {};
     try {
       selectedTraining = await this.LOADCurrentUserTraining(userTrainingList,userEmail);
-      allData = await sp.web.lists.getById(lists).items.select('Id,Title,Module,SubModule,TrainingPath').top(500).get();
+      console.log(selectedTraining);
+      allData = await sp.web.lists.getById(lists).items.select('Id,Title,Module,SubModule,TrainingPath').filter(`Created lt datetime'`+ selectedTraining.Created +`'`).top(500).get();
       allData.map((field) =>{
         if(moduleData.indexOf(field.Module) === -1){
           moduleData.push(field.Module);
