@@ -44,7 +44,6 @@ export class SPDataOperations {
     let trainingIDs:any = {};
     try {
       selectedTraining = await this.LOADCurrentUserTraining(userTrainingList,userEmail);
-      console.log(selectedTraining);
       allData = await sp.web.lists.getById(lists).items.select('Id,Title,Module,SubModule,TrainingPath').filter(`Created lt datetime'`+ selectedTraining.Created +`'`).top(500).get();
       allData.map((field) =>{
         if(moduleData.indexOf(field.Module) === -1){
