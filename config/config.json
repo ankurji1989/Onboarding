@@ -33,6 +33,14 @@
           "manifest": "./src/webparts/onboardingCheckList/OnboardingCheckListWebPart.manifest.json"
         }
       ]
+    },
+    "temp-training-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/tempTraining/TempTrainingWebPart.js",
+          "manifest": "./src/webparts/tempTraining/TempTrainingWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
@@ -42,6 +50,7 @@
     "AssessmentHomeWebPartStrings": "lib/webparts/assessmentHome/loc/{locale}.js",
     "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js",
     "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js",
-    "OnboardingCheckListWebPartStrings": "lib/webparts/onboardingCheckList/loc/{locale}.js"
+    "OnboardingCheckListWebPartStrings": "lib/webparts/onboardingCheckList/loc/{locale}.js",
+    "TempTrainingWebPartStrings": "lib/webparts/tempTraining/loc/{locale}.js"
   }
 }

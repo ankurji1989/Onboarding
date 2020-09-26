@@ -28,6 +28,7 @@
     "office-ui-fabric-react": "6.189.2",
     "react": "16.8.5",
     "react-dom": "16.8.5",
+    "react-moment": "^0.9.7",
     "react-scripts": "^3.4.1",
     "sp-pnp-js": "^3.0.10"
   },

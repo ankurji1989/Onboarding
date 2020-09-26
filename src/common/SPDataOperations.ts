@@ -336,4 +336,13 @@ export class SPDataOperations {
       console.log('SPDataOperations.getListItems' + error);
     }
   }
+
+/*Get Current Logged In User*/  
+public static async getLoggedInUserDetails(ctx: any): Promise<any>{  
+  try {  
+    return await sp.web.currentUser.get();   
+  } catch (error) {  
+    console.log("SPDataOperations.getLoggedInUserDetails " + error);  
+  }      
+}  
 }
