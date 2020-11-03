@@ -6,4 +6,5 @@ export interface ITempTrainingProps {
   displayMode: DisplayMode,
   configured: boolean,
   tempTrainingUserList: string;
+  agreementText: string;
 }

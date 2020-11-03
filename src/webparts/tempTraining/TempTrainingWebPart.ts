@@ -11,13 +11,19 @@ import * as strings from 'TempTrainingWebPartStrings';
 import TempTraining from './components/TempTraining';
 import { ITempTrainingProps } from './components/ITempTrainingProps';
 import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
-
+import { sp } from '@pnp/sp';
 export interface ITempTrainingWebPartProps {
   tempTrainingUserList: string;
+  agreementText: string;
 }
 
 export default class TempTrainingWebPart extends BaseClientSideWebPart <ITempTrainingWebPartProps> {
-
+  protected onInit(): Promise<void> {
+    sp.setup({
+      spfxContext: this.context
+    });
+    return Promise.resolve();
+  }
   public render(): void {
     const element: React.ReactElement<ITempTrainingProps> = React.createElement(
       TempTraining,
@@ -25,7 +31,8 @@ export default class TempTrainingWebPart extends BaseClientSideWebPart <ITempTra
         context: this.context,
         displayMode: this.displayMode,
         configured: (this.properties.tempTrainingUserList !== undefined) ? true : false,
-        tempTrainingUserList: this.properties.tempTrainingUserList
+        tempTrainingUserList: this.properties.tempTrainingUserList,
+        agreementText: this.properties.agreementText
       }
     );
 
@@ -64,6 +71,10 @@ export default class TempTrainingWebPart extends BaseClientSideWebPart <ITempTra
                   deferredValidationTime: 0,
                   key: 'listPickerFieldId'
                 }),
+                PropertyPaneTextField('agreementText', {
+                  label: 'Agreement disclaimer',
+                  value: this.properties.agreementText
+                })
               ]
             }
           ]
