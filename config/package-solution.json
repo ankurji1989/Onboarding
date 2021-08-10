@@ -3,7 +3,7 @@
   "solution": {
     "name": "onboarding-client-side-solution",
     "id": "38d6cc95-41a3-49f1-8157-71e51ead4207",
-    "version": "1.1.0.1",
+    "version": "1.2.0.1",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false
