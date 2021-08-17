@@ -337,12 +337,21 @@ export class SPDataOperations {
     }
   }
 
-/*Get Current Logged In User*/  
-public static async getLoggedInUserDetails(ctx: any): Promise<any>{  
-  try {  
-    return await sp.web.currentUser.get();   
-  } catch (error) {  
-    console.log("SPDataOperations.getLoggedInUserDetails " + error);  
-  }      
-}  
+  /*Get Current Logged In User*/  
+  public static async getLoggedInUserDetails(ctx: any): Promise<any>{  
+    try {  
+      return await sp.web.currentUser.get();   
+    } catch (error) {  
+      console.log("SPDataOperations.getLoggedInUserDetails " + error);  
+    }      
+  }
+
+  /*Get choice column value */  
+  public static async getChoicesFromChoiceColumn(listGuid: string, ColumnName: string): Promise<any>{  
+    try {
+      return await sp.web.lists.getById(listGuid).fields.getByInternalNameOrTitle(ColumnName).select('Choices,ID').get();
+    } catch (error) {  
+      console.log("SPDataOperations.getChoicesFromChoiceColumn " + error);  
+    }      
+  }
 }

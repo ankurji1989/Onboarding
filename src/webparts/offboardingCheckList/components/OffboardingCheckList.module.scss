@@ -3,7 +3,7 @@
 .offboardingCheckList {
   .tableContainer{
     width: 100%;
-    max-width: 800px;
+    max-width: 900px;
     margin: 0px auto;
   }
   
@@ -21,7 +21,7 @@
     }
     tr th:first-child{
       color: #0f538e;
-      width: 170px;
+      width: 100px;
       font-size: 15px;
       padding-bottom: 7px;
       padding-left:5px;
@@ -36,6 +36,21 @@
     margin: 15px 0px;
     button {
       margin-top: 10px;
+    }
+  }
+  .checklistHeading{
+    background: #a2d6fe !important;
+    label {
+      padding-left: 5px;
+      font-weight: 600;
+    }
+  }
+
+  .userDetail{
+    font-weight: bold;
+    margin-bottom: 15px;
+    span {
+      font-weight: normal;
     }
   }
 }
