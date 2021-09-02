@@ -10,7 +10,6 @@ import * as strings from 'OffboardingCheckListWebPartStrings';
 export interface IOffboardingCheckListState {
   employeeData: any[];
   checkList: any[];
-  buttonDisabled: boolean;
   hideDialog: boolean;
   hideConfirmDialog: boolean;
   formSubmit: boolean;
@@ -37,7 +36,6 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
     this.state = {
       employeeData: [],
       checkList: [],
-      buttonDisabled: false,
       hideDialog: true,
       hideConfirmDialog: true,
       formSubmit: false,
@@ -61,7 +59,7 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
       this.getEmployeeCheckList(Number(offboardingId));
     }
   }
-  
+
   public async getChoicesFromChoiceColumn() {
     let leaveTypeOption: IDropdownOption[] = [];
     SPDataOperations.getChoicesFromChoiceColumn(this.props.onboardingList, strings.LeaveTypeColumn).then((choiceData) => {
@@ -75,7 +73,7 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
   }
 
   public async getEmployeeCheckList(empId: number) {
-    
+
     SPDataOperations.getListItems(this.props.onboardingList, 'Employee,RegistrationListItemID,OffBoardingCheckList/Id,OffBoardingCheckListNA/Id,EmployeeID1/Title,CheckListCompleted,OffBoardingStatus,LastWorkingDay,LeaveType,OffBoardingStartDate','OffBoardingCheckList,OffBoardingCheckListNA,EmployeeID1',`Id eq ${empId}`).then((offboardingData) => {
       if(offboardingData.length > 0 ) {
         this.getCheckListDetails(offboardingData[0]);
@@ -93,7 +91,7 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
           selected: employeeData.OffBoardingCheckList.filter(item => listItem.Id === item.Id).length > 0 ? true : false,
           notApplicable: employeeData.OffBoardingCheckListNA.filter(item => listItem.Id === item.Id).length > 0 ? true : false,
           required: listItem.Required === true ? true : false,
-          colType: (listItem.ColType === null || listItem.ColType === ``) ? null : (listItem.ColType).toLowerCase() 
+          colType: (listItem.ColType === null || listItem.ColType === ``) ? null : (listItem.ColType).toLowerCase()
         };
         updatedChecklist.push(checkListObject);
       });
@@ -109,14 +107,13 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
         }
       });
 
-      const buttonDisabled: boolean = checkListCount === CheckedListCount ? true : false;
       const lastWorkingDay = employeeData.LastWorkingDay !== null ? new Date(employeeData.LastWorkingDay) : null;
       const leaveType = employeeData.LeaveType !== null ? employeeData.LeaveType : null;
       const emplayeeName = employeeData.EmployeeID1 ? employeeData.EmployeeID1.Title : null;
-      this.setState({checkList: updatedChecklist, buttonDisabled: buttonDisabled, checkedListTotalCount: CheckedListCount, offboardingStatus: employeeData.OffBoardingStatus, lastWorkingDate: lastWorkingDay, hideDialog: true, hideConfirmDialog: true, leaveType: leaveType, offboardingStartDate: employeeData.OffBoardingStartDate, emplayeeName: emplayeeName});
+      this.setState({checkList: updatedChecklist, checkedListTotalCount: CheckedListCount, offboardingStatus: employeeData.OffBoardingStatus, lastWorkingDate: lastWorkingDay, hideDialog: true, hideConfirmDialog: true, leaveType: leaveType, offboardingStartDate: employeeData.OffBoardingStartDate, emplayeeName: emplayeeName});
     });
   }
-  
+
   public toggleOnChange(item: any) {
     let checkList = this.state.checkList.slice();
     checkList.filter(listItem => listItem.Id === item.Id).map(selectedItem => {
@@ -176,9 +173,9 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
           updateObject.OffBoardingCompletionDate = new Date();
         } else {
           updateObject.OffBoardingStatus = 'In Progress';
-          if(offboardingStartDate === null) {
-            updateObject.OffBoardingStartDate = new Date();
-          }
+        }
+        if(offboardingStartDate === null) {
+          updateObject.OffBoardingStartDate = new Date();
         }
         if(lastWorkingDate !== null) {
           updateObject.LastWorkingDay = lastWorkingDate;
@@ -188,9 +185,9 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
         }
         await SPDataOperations.updateListItem(this.props.onboardingList, this.offboardingId, updateObject);
         this.getEmployeeCheckList(this.offboardingId);
-        this.setState({formSubmit: true});  
+        this.setState({formSubmit: true});
         setTimeout(() => {
-          this.setState({formSubmit: false});  
+          this.setState({formSubmit: false});
         }, 5000);
       }
     }
@@ -207,9 +204,9 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
     await SPDataOperations.updateListItem(this.props.onboardingList, this.offboardingId, updateObject);
     this.getEmployeeCheckList(this.offboardingId);
   }
-  
+
   public render(): React.ReactElement<IOffboardingCheckListProps> {
-    const {checkList, buttonDisabled, formSubmit, hideConfirmDialog, hideDialog, checkedListTotalCount, submitRecall, offboardingStatus, lastWorkingDate, leaveType, leaveTypeOption, emplayeeName} = this.state;
+    const {checkList, formSubmit, hideConfirmDialog, hideDialog, checkedListTotalCount, submitRecall, offboardingStatus, lastWorkingDate, leaveType, leaveTypeOption, emplayeeName} = this.state;
     return (
       <div className={ styles.offboardingCheckList }>
         <div className={styles.tableContainer}>
@@ -222,21 +219,24 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
               </tr>
               {checkList.map((item) =>{
                 return (<tr>
-                  {item.colType === 'heading' ? 
+                  {item.colType === 'heading' ?
                     <td colSpan={3} className={styles.checklistHeading}><Label>{item.Title}</Label></td>
                   :
                   <td>
-                    {item.colType !== 'heading' &&
+                    {item.colType !== 'heading' && item.notApplicable &&
+                      <Toggle label='' inlineLabel onText='Yes' offText='No' onChange={() => this.toggleOnChange(item)} defaultChecked={item.notApplicable} disabled={item.required} title={item.required ? 'Checklist Required' : null }  />
+                    }
+                    {item.colType !== 'heading' && !item.notApplicable &&
                       <Toggle label='' inlineLabel onText='Yes' offText='No' onChange={() => this.toggleOnChange(item)} defaultChecked={item.notApplicable} disabled={item.required} title={item.required ? 'Checklist Required' : null }  />
                     }
                   </td>
                   }
-                  {item.colType !== 'heading' && 
+                  {item.colType !== 'heading' &&
                   <td>
                     <Checkbox label={item.Title + (item.required ? '*' : '')} onChange={() => this.checkBoxOnChange(item)} checked={item.selected} disabled={item.notApplicable} />
                   </td>
                   }
-                  {item.colType !== 'heading' && 
+                  {item.colType !== 'heading' &&
                   <td>
                     {item.colType === 'date' &&
                       <div>
@@ -245,6 +245,7 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
                           disabled={item.selected ? false : true}
                           isRequired={item.selected ? true : false}
                           showMonthPickerAsOverlay={true}
+                          minDate={new Date()}
                           placeholder="Select last working date..."
                           ariaLabel="Select last working date"
                           onSelectDate={date => this.setState({ lastWorkingDate: date })}
@@ -253,10 +254,11 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
                     }
                     {item.colType === 'dropdown' &&
                       <Dropdown
-                        placeholder="Select Leave Type"
-                        options={leaveTypeOption}
+                        placeholder="Select Leaver Type"
+                        options={item.selected ? leaveTypeOption : []}
                         disabled={item.selected ? false : true}
                         defaultSelectedKey={leaveType}
+                        required={item.selected ? true : false}
                         onChange={(event, ddvalue) => this.setState({leaveType: ddvalue.text})}
                       />
                     }
@@ -269,8 +271,8 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
               {formSubmit === true &&
                 <MessageBar messageBarType={MessageBarType.success}  onDismiss={() => this.setState({formSubmit:false})} dismissButtonAriaLabel="Close">Checklist items are saved successfully.</MessageBar>
               }
-              <DefaultButton text={'Recall'} onClick={() => this.setState({submitRecall: true, hideConfirmDialog: false})} disabled={(checkedListTotalCount === 0 || offboardingStatus === 'Completed') ? true : false}></DefaultButton>
-              <PrimaryButton text={'Submit'} onClick={() => this.submitCheckList(false)} disabled={(buttonDisabled || offboardingStatus === 'Completed') ? true : false} style={{marginLeft: '10px'}} />
+              <DefaultButton text={'Recall'} onClick={() => this.setState({submitRecall: true, hideConfirmDialog: false})} disabled={(checkedListTotalCount === 0 || offboardingStatus === 'Closed') ? true : false}></DefaultButton>
+              <PrimaryButton text={'Submit'} onClick={() => this.submitCheckList(false)} disabled={(offboardingStatus === 'Closed') ? true : false} style={{marginLeft: '10px'}} />
             </div>
           </div>
 
@@ -304,7 +306,7 @@ export default class OffboardingCheckList extends React.Component<IOffboardingCh
         >
           <Spinner label="Please wait..." />
         </Dialog>
-        
+
       </div>
     );
   }
