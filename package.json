@@ -29,19 +29,19 @@
     "react": "16.8.5",
     "react-dom": "16.8.5",
     "react-moment": "^0.9.7",
-    "react-scripts": "^3.4.1",
+    "react-scripts": "^5.0.1",
     "sp-pnp-js": "^3.0.10"
   },
   "resolutions": {
     "@types/react": "16.8.8"
   },
   "devDependencies": {
-    "@microsoft/sp-build-web": "1.10.0",
+    "@microsoft/sp-build-web": "1.17.4",
     "@microsoft/sp-tslint-rules": "1.10.0",
     "@microsoft/sp-module-interfaces": "1.10.0",
-    "@microsoft/sp-webpart-workbench": "1.10.0",
+    "@microsoft/sp-webpart-workbench": "1.12.1",
     "@microsoft/rush-stack-compiler-3.3": "0.3.5",
-    "gulp": "~3.9.1",
+    "gulp": "~4.0.2",
     "@types/chai": "3.4.34",
     "@types/mocha": "2.2.38",
     "ajv": "~5.2.2"
